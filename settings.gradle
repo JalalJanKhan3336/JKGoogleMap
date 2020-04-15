@@ -1,0 +1,3 @@
+include ':jkgooglymap'
+include ':app'
+rootProject.name = "JKGoogleMap"

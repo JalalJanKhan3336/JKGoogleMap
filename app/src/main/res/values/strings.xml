@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">JKGoogleMap</string>
+    <string name="google_maps_api_key">AIzaSyBgpm0lxdLPACEOgJI6EgDYqNwFZJFiVTw</string>
+    <string name="search_place">Search Places here</string>
+</resources>
