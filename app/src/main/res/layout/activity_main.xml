@@ -16,20 +16,7 @@
         android:orientation="horizontal"
         android:background="@android:color/white">
 
-        <EditText
-            android:id="@+id/search_box"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="9.5"
-            android:inputType="text"
-            android:hint="@string/search_place"/>
-
-        <ImageView
-            android:id="@+id/search_iv"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_weight="0.5"
-            android:src="@drawable/ic_search"/>
+        <include layout="@layout/google_auto_complete_places_layout"/>
 
     </LinearLayout>
 

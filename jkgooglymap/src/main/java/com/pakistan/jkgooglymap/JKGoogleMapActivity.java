@@ -25,14 +25,22 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -56,8 +64,10 @@ public abstract class JKGoogleMapActivity extends AppCompatActivity implements O
     public abstract void onDenied();
     public abstract void onGoogleMapReady(GoogleMap map);
     protected abstract void onCurrentLocationFound(Location currentLocation, String msg);
+    protected abstract void onPlaceSearched(Place place, String msg);
 
     // Google References
+    private PlaceAutocompleteFragment mPlaceAutocompleteFragment;
     protected SupportMapFragment mSupportMapFragment;
     protected FusedLocationProviderClient mFusedLocationProviderClient;
 
@@ -129,15 +139,47 @@ public abstract class JKGoogleMapActivity extends AppCompatActivity implements O
         builder.create().show();
     }
 
+    // Add Marker to specified location
+    protected Marker addMarkerTo(GoogleMap map, LatLng latLng, String title, String snippet, int icon) {
+        MarkerOptions options = new MarkerOptions();
+        options.title(title);
+        options.snippet(snippet);
+        options.position(latLng);
+        options.icon(BitmapDescriptorFactory.fromResource(icon));
+
+        return map.addMarker(options);
+    }
+
     // Animate Camera to specified location
     protected void animateCameraTo(GoogleMap map, LatLng latLng){
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL);
         map.moveCamera(cameraUpdate);
     }
 
+    // initialize Google Places
+    protected void initGooglePlaces(int placeResId){
+        mPlaceAutocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(placeResId);
+        mPlaceAutocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                Log.d(TAG, "_on_Google_PlaceSelected: "+place);
+                if(place != null)
+                    onPlaceSearched(place, "Searched Place found");
+                else
+                    onPlaceSearched(null, "Searched Place not found");
+            }
+
+            @Override
+            public void onError(Status status) {
+                Log.e(TAG, "_on_Google_PlaceSelected_Error: "+status.toString());
+                onPlaceSearched(null, status.toString());
+            }
+        });
+    }
+
     // initialize Google Map
-    protected void initGoogleMap(int mapId){
-        mSupportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(mapId);
+    protected void initGoogleMap(int mapResId){
+        mSupportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(mapResId);
         mSupportMapFragment.getMapAsync(this);
     }
 

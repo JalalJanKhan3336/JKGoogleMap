@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.pakistan.jkgooglymap.JKGoogleMapActivity;
@@ -25,6 +26,7 @@ public class MainActivity extends JKGoogleMapActivity {
         setContentView(R.layout.activity_main);
 
         initMap();
+        initGooglePlaces(R.id.google_map_auto_complete_places_search_fragment);
     }
 
     // initialize Map
@@ -75,4 +77,18 @@ public class MainActivity extends JKGoogleMapActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         animateCameraTo(mGoogleMap, new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
     }
+
+    @Override
+    protected void onPlaceSearched(Place place, String msg) {
+        Log.d(TAG, "_onPlaceSearched: "+place);
+        Log.d(TAG, "_onPlaceSearched_Msg: "+msg);
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+
+        if(place != null){
+            addMarkerTo(mGoogleMap, place.getLatLng(), place.getName().toString(),place.getLocale().toString(), R.drawable.ic_target_location);
+            animateCameraTo(mGoogleMap, place.getLatLng());
+        }
+
+    }
+
 }
